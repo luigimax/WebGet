@@ -53,6 +53,20 @@
        <scope>system</scope>
        <systemPath>${basedir}/lib/scalaxml.jar</systemPath>
     </dependency>
+    <dependency>
+       <groupId>org.ccil.cowan.tagsoup</groupId>
+       <artifactId>tagsoup</artifactId>
+       <version>1.2</version>
+       <scope>system</scope>
+       <systemPath>${basedir}/lib/tagsoup-1.2.jar</systemPath>
+    </dependency>
+    <dependency>
+       <groupId>org.htmlcleaner</groupId>
+       <artifactId>htmlcleaner</artifactId>
+       <version>2.1</version>
+       <scope>system</scope>
+       <systemPath>${basedir}/lib/htmlcleaner2_1.jar</systemPath>
+    </dependency>
   </dependencies>
 
   <build>

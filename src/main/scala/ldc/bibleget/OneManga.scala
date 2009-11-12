@@ -11,7 +11,8 @@ import scala.xml._
 import scala.collection.mutable._
 
 class OneManga {
-    val url = "http://www.onemanga.com/directory"
+    val url = "http://www.onemanga.com"
+    val net = new NetParse
     
     var xml:Node = <head/>
     var folders = new HashMap[String, String]
@@ -22,8 +23,8 @@ class OneManga {
     }
 
     def titleSeq = {
-        val net = new NetParse
-        net.parse(url)
+        
+        net.parse(url+"/directory")
         xml = net.xml
         
         var a: Node = <head/>
@@ -58,7 +59,6 @@ class OneManga {
         manga.parse(s)
         val mXml = manga.xml
         println(mXml)
-        println(url + key)
     }
 
 }

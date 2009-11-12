@@ -26,9 +26,11 @@ class NetParse {
 
         var sorce:InputSource = new InputSource
         var neo = new TagSoupFactoryAdapter //load sUrl
+        var input = connect.getInputStream
 
-        sorce.setByteStream(connect.getInputStream)
+        sorce.setByteStream(input)
         xml = neo.loadXML(sorce)
+        input.close
     }
 
 

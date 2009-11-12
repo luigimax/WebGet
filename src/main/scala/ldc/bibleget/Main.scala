@@ -6,10 +6,12 @@ import scala.xml.parsing.XhtmlParser
 object Main {
   def main(args:Array[String]): Unit = {
       println("Big World")
-      val url = "http://bibliacat.pbworks.com/Bible-Research"
-      var net: NetParse = new NetParse
+      val url = "http://www.onemanga.com/directory/"
+      val one = new OneManga
+      one.run
       
-      println(net.parse(url))
+      
+      println()
       true
     }
 }

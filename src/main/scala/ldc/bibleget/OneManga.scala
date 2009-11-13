@@ -16,10 +16,13 @@ class OneManga {
     
     var xml:Node = <head/>
     var folders = new HashMap[String, String]
+    var urlIndex = new Queue[String]
 
     def run = {
         titleSeq
         mangaSeq("/Angel_Voice/")
+        //mangaSeq("/Ai_Kora/")
+        urlIndex.foreach(println(_))
     }
 
     def titleSeq = {
@@ -58,7 +61,19 @@ class OneManga {
         val s = url + key
         manga.parse(s)
         val mXml = manga.xml
-        println(mXml)
+
+        var q = new Queue[String]
+
+        val td = mXml \\ "td"
+        val a = td \ "a"
+        a.foreach((x) =>{
+                val ro = x.attribute("href")
+                ro match{
+                    case Some(res) => q.enqueue(url + res.toString)
+                    case _ => false
+                }
+        })
+        urlIndex ++= q.reverse
     }
 
 }

@@ -16,18 +16,44 @@ case class InitActor(listener: Actor)
 case class SetDowns(num: Int)
 case class UpdateDowns
 case class AddImg(img: String)
-case class AddImgs(imgs: HashSet[String])
+case class AddImgs(imgs: Queue[String])
 case class AddPages(page: String)
+case class Ping
+case class WantWork
+case class NeedWork
+case class WorkDoneLink(str: String)
 
 object DownController extends Actor {
     var downs: Int = 5
+    val centralQ = new Queue[String]
+    val actList = new HashSet[Actor]
 
     def act = {
         loop{
             react{
-                case SetDowns(num)=> downs = num
-                case AddImgs(imgs)=> true
+                case SetDowns(num)=>
+                    downs = num
+                case AddImgs(imgs)=>
+                    centralQ ++= imgs
+                case NeedWork => 
+                    reply(AddImg(centralQ.dequeue))
+                case WorkDoneLink(str: String) =>
+                    reply(AddImg(centralQ.dequeue))
             }
+        }
+    }
+
+    def distDowns = {
+        for(x <- actList){
+            x ! AddImg(centralQ.dequeue)
+        }
+    }
+
+    def makeActors = {
+        for(c <- (1 until downs)){
+            val a = new DownActor
+            actList += a
+            a ! InitActor(this)
         }
     }
 

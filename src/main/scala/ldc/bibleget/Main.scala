@@ -8,10 +8,13 @@ object Main {
       println("Big World")
       val url = "http://www.onemanga.com/directory/"
       val one = new OneManga
-      one.run
+      //one.run
+
+      val reo = new BinDown
+      reo.mkdir("Angel_voice/")
+      reo.down("http://media.onemanga.com/mangas/00000478/00000001/02.jpg", "Angel_voice/Angel_voice-c001-p02.jpg")
       
       
-      println()
       true
     }
 }

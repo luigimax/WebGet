@@ -39,6 +39,11 @@ object DownController extends Actor {
                     reply(AddImg(centralQ.dequeue))
                 case WorkDoneLink(str: String) =>
                     reply(AddImg(centralQ.dequeue))
+                    centralQ.enqueue(str)
+                case Ping =>
+                    makeActors
+                    checkDist
+
             }
         }
     }
@@ -49,12 +54,26 @@ object DownController extends Actor {
         }
     }
 
+    def checkDist = {
+        for(x <- actList){
+            x ! WantWork
+        }
+    }
+
     def makeActors = {
-        for(c <- (1 until downs)){
+        for(c <- (actList.size until downs)){
             val a = new DownActor
             actList += a
             a ! InitActor(this)
         }
+    }
+
+    def nextQ : String = {
+      if(centralQ.isEmpty){
+        return "empt"
+      }else{
+        return centralQ.dequeue
+      }
     }
 
     start

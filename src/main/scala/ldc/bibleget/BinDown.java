@@ -2,6 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  * author: http://www.java2s.com/Tutorial/Java/0320__Network/SavebinaryfilefromURL.htm
+ * and is modded by Luke Harvey
  */
 
 package ldc.bibleget;
@@ -19,6 +20,8 @@ public class BinDown {
 
     public void down(String ur, String fName) throws Exception {
 
+        File seeF = new File(fName);
+        if(!seeF.exists()){
     URL u = new URL(ur);
     URLConnection uc = u.openConnection();
     String contentType = uc.getContentType();
@@ -49,6 +52,9 @@ public class BinDown {
     out.flush();
     out.close();
     System.out.println("File Writen: " + fName);
+    }else{
+        System.out.println("File Exists");
+    }
   }
 
     public void mkdir(String dir){

@@ -51,17 +51,7 @@ class DownActor extends Actor {
             if(lst(3) == "www.onemanga.com"){
                 atPage(lst)
             }
-          }else{
-              //println("DoWorkempt")
-              
-
-            //control ! NeedWork
           }
-      
-      
-
-
-     
       work = false
     }
 

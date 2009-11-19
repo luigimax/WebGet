@@ -22,7 +22,11 @@ class OneManga {
         titleSeq
         mangaSeq("/Angel_Voice/")
         //mangaSeq("/Ai_Kora/")
-        urlIndex.foreach(println(_))
+        //urlIndex.foreach(println(_))
+        println("angelDone")
+        DownController !? AddImgs(urlIndex)
+        DownController ! Ping
+
     }
 
     def titleSeq = {

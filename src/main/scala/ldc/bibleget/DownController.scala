@@ -119,7 +119,10 @@ object DownController extends Actor {
         if(!done.contains(add)){
             centralQ += add
             done += add
-        }else println("gotThat")
+        }else{
+            println("gotThat")
+            checkDist
+        }
     }
 
     def cQ2(add: Queue[String]) ={
@@ -131,6 +134,7 @@ object DownController extends Actor {
             centralImg += img
             doneImg += img
         }
+        checkDist
     }
 
     start

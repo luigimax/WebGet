@@ -44,8 +44,9 @@ class BinGetActor extends Actor {
     def doWork(img: Img) = {
         work = true
         val er = img.desired.split("-")
-        bin.mkdir(er(0))
-        bin.down(img.actual, er(0)+"/"+img.desired)
+        val dir = "/media/X Disk/Common/" + er(0)
+        bin.mkdir(dir)
+        bin.down(img.actual, dir+"/"+img.desired)
         println("Got: "+ img.desired)
         work = false
     }

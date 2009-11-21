@@ -54,6 +54,13 @@
        <scope>system</scope>
        <systemPath>${basedir}/lib/tagsoup-1.2.jar</systemPath>
     </dependency>
+    <dependency>
+       <groupId>tfd.scala.squib</groupId>
+       <artifactId>squib</artifactId>
+       <version>0.5</version>
+       <scope>system</scope>
+       <systemPath>${basedir}/lib/scala_squib_0_5.jar</systemPath>
+    </dependency>
   </dependencies>
 
   <build>

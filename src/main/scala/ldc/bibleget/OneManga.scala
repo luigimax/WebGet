@@ -20,7 +20,11 @@ class OneManga {
 
     def run = {
         titleSeq
-        mangaSeq("/Angel_Voice/")
+        //mangaSeq("/12_Prince/")
+        //mangaSeq("/No_Bra/")
+        //mangaSeq("/Veritas/")
+	mangaSeq("/Freezing/")
+	mangaSeq("/Black_God/")
         //mangaSeq("/Ai_Kora/")
         //urlIndex.foreach(println(_))
         println("angelDone")

@@ -75,7 +75,20 @@ class DownActor extends Actor {
                         val href = a \ "@href"
                         val img = c \\ "img"
                         val src = img \ "@src"
-                        val actu = lst(2)+"-ch"+lst(1)+"-p"+lst(0)+".jpg"
+                        var l1 = lst(1)
+                        for(c <- (lst(1).length until 4 )){
+                            l1 = "0"+ l1
+                        }
+                        var l2 = lst(0)
+                        if(l2.contains("-")){
+
+                            var n = l2.split("-")
+                            l2 = n(0)
+                        }
+                        for(c <- (l2.length until 4 )){
+                            l2 = "0"+ l2
+                        }
+                        val actu = lst(2)+"-ch"+l1+"-p"+l2+".jpg"
                         println("Parse: "+actu)
                         control ! WorkDoneImg(Img(actu, src.toString), "http://www.onemanga.com" + href.toString)
                     }

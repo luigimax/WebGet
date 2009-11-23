@@ -21,13 +21,21 @@ class OneManga {
     def run = {
         titleSeq
         //mangaSeq("/12_Prince/")
-        //mangaSeq("/No_Bra/")
+        //mangaSeq("/Ane_Doki/")
         //mangaSeq("/Veritas/")
-	mangaSeq("/Freezing/")
-	mangaSeq("/Black_God/")
-        //mangaSeq("/Ai_Kora/")
+	//mangaSeq("/Freezing/")
+	//mangaSeq("/ARISA/")
+	//mangaSeq("/Hadashi_de_Bara_wo_Fume/")
+	//mangaSeq("/Liar_Game/")
+	//mangaSeq("/Dollgun/")
+	//mangaSeq("/Kimi_no_Iru_Machi/")
+	//mangaSeq("/Mother_Keeper/")
+        //mangaSeq("/Code_Breaker/")
+        //mangaSeq("/Mahou_Sensei_Negima!/")
+        //mangaSeq("/Shut_Hell/")
         //urlIndex.foreach(println(_))
         println("angelDone")
+	DownController ! SetDowns(20)
         DownController !? AddImgs(urlIndex)
         DownController ! Ping
 

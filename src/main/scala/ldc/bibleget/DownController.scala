@@ -30,6 +30,7 @@ case class Img(desired: String, actual: String)
 
 object DownController extends Actor {
     var downs: Int = 5
+    var dl: String = ""
     val centralQ = new Queue[String]
     val actList = new HashSet[Actor]
     val centralImg = new Queue[Img]
@@ -135,6 +136,10 @@ object DownController extends Actor {
             doneImg += img
         }
         checkDist
+    }
+
+    def setDl(loc: String) = {
+        this.dl = loc
     }
 
     start

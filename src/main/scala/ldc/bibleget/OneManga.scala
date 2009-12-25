@@ -92,5 +92,16 @@ class OneManga {
         urlIndex ++= q.reverse
     }
 
+    def titleSeqList:javax.swing.DefaultListModel ={
+        import scala.util.Sorting
+        val get = new javax.swing.DefaultListModel
+        titleSeq
+        val key = folders.keys
+
+        key.foreach((sub) => get.addElement(sub))
+        
+        return get
+    }
+
 }
 

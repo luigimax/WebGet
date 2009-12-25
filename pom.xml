@@ -15,6 +15,11 @@
       <name>Scala-Tools Maven2 Repository</name>
       <url>http://scala-tools.org/repo-releases</url>
     </repository>
+    <repository>
+      <id>unknown-jars-temp-repo</id>
+      <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please replace the dependencies in this repository with correct ones and delete this repository.</name>
+      <url>file:${project.basedir}/lib</url>
+    </repository>
   </repositories>
 
   <pluginRepositories>
@@ -55,11 +60,21 @@
        <systemPath>${basedir}/lib/tagsoup-1.2.jar</systemPath>
     </dependency>
     <dependency>
-       <groupId>tfd.scala.squib</groupId>
-       <artifactId>squib</artifactId>
-       <version>0.5</version>
+       <groupId>net.sourceforge.jsorter</groupId>
+       <artifactId>tagsoup</artifactId>
+       <version>0.9</version>
        <scope>system</scope>
-       <systemPath>${basedir}/lib/scala_squib_0_5.jar</systemPath>
+       <systemPath>${basedir}/lib/jsorter.jar</systemPath>
+    </dependency>
+    <dependency>
+        <groupId>hsqldb</groupId>
+        <artifactId>hsqldb</artifactId>
+        <version>1.8.0.10</version>
+    </dependency>
+    <dependency>
+      <groupId>unknown.binary</groupId>
+      <artifactId>beansbinding-1.2.1</artifactId>
+      <version>SNAPSHOT</version>
     </dependency>
   </dependencies>
 
@@ -138,3 +153,4 @@
     </plugins>
   </reporting>
 </project>
+

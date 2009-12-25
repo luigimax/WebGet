@@ -1,8 +1,11 @@
 /*
  * NetParse.scala
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * Author: Luke Harvey
+ *
+    purpose: A wraper for TagSoup library
+    When parse is called it downloads the html and converts it
+    to Xhtml and stores it in -xml-
  */
 
 package ldc.bibleget

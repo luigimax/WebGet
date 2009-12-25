@@ -57,6 +57,12 @@ public class BinDown {
     }
   }
 
+    /*
+     * mkdir Author: Luke Harvey
+     * this function is called whenever a new file is downloaded
+     * only creates a new Diirectory if it does not already exist
+     *
+     */
     public void mkdir(String dir){
         File f = new File(dir);
         try{

@@ -1,8 +1,14 @@
 /*
  * OneManga.scala
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * Author: Luke Harvey
+ * purpose: The module (not a module yet - module api not implemented)
+    OneManga downloads the specifyed manga frome the website onemanga.com
+
+    Future plan: Implement module api and traits to seperate onemanga from
+    the rest of the program and allow for easy extenstion (the origonal plan)
+    -refactor the package to reflect the project name
+    (artifact from first stage)
  */
 
 package ldc.bibleget
@@ -11,13 +17,18 @@ import scala.xml._
 import scala.collection.mutable._
 
 class OneManga {
+    //url - the location of website
     val url = "http://www.onemanga.com"
+    //net - holds the NetParse wraper
     val net = new NetParse
-    
+
+    //xml - hold the title directory xml
     var xml:Node = <head/>
+    //folders - 
     var folders = new HashMap[String, String]
     var urlIndex = new Queue[String]
 
+    //this is used to start downloading
     def run = {
         titleSeq
         //mangaSeq("/12_Prince/")
@@ -41,6 +52,7 @@ class OneManga {
 
     }
 
+    //download the titles listing
     def titleSeq = {
         
         net.parse(url+"/directory")
@@ -72,6 +84,7 @@ class OneManga {
         //key.foreach((sub) => println(sub + ":" + folders(sub)))
     }
 
+    //download the initial chapter links for initial parseing
     def mangaSeq(key:String) = {
         val manga = new NetParse
         val s = url + key
@@ -92,6 +105,7 @@ class OneManga {
         urlIndex ++= q.reverse
     }
 
+    //puts the title into a swing list
     def titleSeqList:javax.swing.DefaultListModel ={
         import scala.util.Sorting
         val get = new javax.swing.DefaultListModel
@@ -103,6 +117,7 @@ class OneManga {
         return get
     }
 
+    //kills all the actors to close program
     def clean = {
         DownController ! CleanUp
     }

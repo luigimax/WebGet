@@ -6,24 +6,14 @@
  */
 
 package ldc.bibleget
-
-import java.sql.DriverManager
-import org.hsqldb.jdbc._
+import scala.io.BytePickle
 
 object db {
+    val setting = new Settings
+    def init = {
 
-    var c: java.sql.Connection = DriverManager.getConnection("jdbc:hsqldb:file:testdb", "SA", "")
 
-    def conn ={ 
-        //c
     }
 
-    def kill = {
-        //c.nativeSQL("SHUTDOWN")
-    }
-
-    def dir = {
-        //c.nativeSQL("create table dir(loc blob)")
-        //c.nativeSQL("")
-    }
+    
 }

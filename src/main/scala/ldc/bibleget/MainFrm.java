@@ -12,6 +12,7 @@
 package ldc.bibleget;
 
 import net.sourceforge.jsorter.SwingSorter;
+import java.awt.event.*;
 /**
  *
  * @author Luke Harvey
@@ -23,11 +24,13 @@ public class MainFrm extends javax.swing.JFrame {
         swingSorter = new SwingSorter();
         one = new OneManga();
         AllManga = one.titleSeqList();
+        //AllManga = new javax.swing.DefaultListModel();
         swingSorter.sortListModel(AllManga);
         Gets = new javax.swing.DefaultListModel();
-        //Gets.addElement("boo");
+        //Gets.addElement("/C_Sword_and_Cornett/");
+        
         initComponents();
-       
+       //sudo();
         //AllManga = new javax.swing.DefaultListModel();
     }
 
@@ -219,6 +222,13 @@ public class MainFrm extends javax.swing.JFrame {
         one.run();
     }//GEN-LAST:event_oneMangaRunActionPerformed
 
+    private void sudo() {
+        for (int x=0; x < Gets.size(); x++){
+            one.mangaSeq((String)Gets.get(x));
+        }
+        DownController.setDl(jTextField1.getText());
+        one.run();
+    }
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField1ActionPerformed
@@ -228,7 +238,8 @@ public class MainFrm extends javax.swing.JFrame {
     }//GEN-LAST:event_closeActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        db.kill();
+        //db.kill();
+        one.clean();
     }//GEN-LAST:event_formWindowClosing
 
     private  SwingSorter swingSorter;

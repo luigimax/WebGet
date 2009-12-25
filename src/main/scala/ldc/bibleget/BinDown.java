@@ -22,38 +22,38 @@ public class BinDown {
 
         File seeF = new File(fName);
         if(!seeF.exists()){
-    URL u = new URL(ur);
-    URLConnection uc = u.openConnection();
-    String contentType = uc.getContentType();
-    int contentLength = uc.getContentLength();
-    if (contentType.startsWith("text/") || contentLength == -1) {
-      throw new IOException("This is not a binary file.");
-    }
-    InputStream raw = uc.getInputStream();
-    InputStream in = new BufferedInputStream(raw);
-    byte[] data = new byte[contentLength];
-    int bytesRead = 0;
-    int offset = 0;
-    while (offset < contentLength) {
-      bytesRead = in.read(data, offset, data.length - offset);
-      if (bytesRead == -1)
-        break;
-      offset += bytesRead;
-    }
-    in.close();
+            URL u = new URL(ur);
+            URLConnection uc = u.openConnection();
+            String contentType = uc.getContentType();
+            int contentLength = uc.getContentLength();
+            if (contentType.startsWith("text/") || contentLength == -1) {
+                throw new IOException("This is not a binary file.");
+            }
+            InputStream raw = uc.getInputStream();
+            InputStream in = new BufferedInputStream(raw);
+            byte[] data = new byte[contentLength];
+            int bytesRead = 0;
+            int offset = 0;
+            while (offset < contentLength) {
+                bytesRead = in.read(data, offset, data.length - offset);
+                if (bytesRead == -1)
+                    break;
+                offset += bytesRead;
+            }
+            in.close();
 
-    if (offset != contentLength) {
-      throw new IOException("Only read " + offset + " bytes; Expected " + contentLength + " bytes");
-    }
+            if (offset != contentLength) {
+                throw new IOException("Only read " + offset + " bytes; Expected " + contentLength + " bytes");
+            }
 
-    String filename = fName; //u.getFile().substring(filename.lastIndexOf('/') + 1);
-    FileOutputStream out = new FileOutputStream(filename);
-    out.write(data);
-    out.flush();
-    out.close();
-    System.out.println("File Writen: " + fName);
+    //String filename = fName; //u.getFile().substring(filename.lastIndexOf('/') + 1);
+            FileOutputStream out = new FileOutputStream(fName);
+            out.write(data);
+            out.flush();
+            out.close();
+            System.out.println("File Writen: " + fName);
     }else{
-        System.out.println("File Exists");
+            System.out.println("File Exists");
     }
   }
 

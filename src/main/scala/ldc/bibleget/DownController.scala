@@ -29,7 +29,7 @@ case class CleanUp
 case class Img(desired: String, actual: String)
 
 object DownController extends Actor {
-    var downs: Int = 5
+    var downs: Int = 1
     var dl: String = ""
     val centralQ = new Queue[String]
     val actList = new HashSet[Actor]
@@ -117,13 +117,15 @@ object DownController extends Actor {
     }
 
     def cQ(add: String) = {
-        if(!done.contains(add)){
-            centralQ += add
-            done += add
-        }else{
-            println("gotThat")
-            checkDist
-        }
+        
+            if(!done.contains(add)){
+                centralQ += add
+                done += add
+            }else{
+                //println("gotThat") // way to many results
+                checkDist
+            }
+        
     }
 
     def cQ2(add: Queue[String]) ={

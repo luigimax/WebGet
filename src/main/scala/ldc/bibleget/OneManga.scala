@@ -35,7 +35,7 @@ class OneManga {
         //mangaSeq("/Shut_Hell/")
         //urlIndex.foreach(println(_))
         println("angelDone")
-	DownController ! SetDowns(20)
+	DownController ! SetDowns(20) //this command needs a scale down
         DownController !? AddImgs(urlIndex)
         DownController ! Ping
 
@@ -101,6 +101,10 @@ class OneManga {
         key.foreach((sub) => get.addElement(sub))
         
         return get
+    }
+
+    def clean = {
+        DownController ! CleanUp
     }
 
 }

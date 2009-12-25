@@ -17,6 +17,7 @@ class DownActor extends Actor {
     var control: Actor = actor()
     var net = new NetParse
     var xm: Node = <head/>
+    var curent: String = ""
     val q = new Queue[String]
 
     def act = {
@@ -43,15 +44,29 @@ class DownActor extends Actor {
       val cur = q.dequeue
           if(cur != "empt"){
             val lst = cur.split("/").reverse
+            println ("LIST SIZE: " +lst.size)
+            if (lst.size <= 3) println("CUR: "+cur)
+
+            try {
+            curent = cur
             net.parse(cur)
             xm = net.xml
-            if(lst(2) == "www.onemanga.com"){
-                atChap
+            if(lst.size >= 2){
+                if(lst(2) == "www.onemanga.com"){
+                    atChap
+                }
             }
-            if(lst(3) == "www.onemanga.com"){
-                atPage(lst)
+            if (lst.size >= 3){
+                if(lst(3) == "www.onemanga.com"){
+                    atPage(lst)
+                }
             }
+            }catch{
+                case e => println("Error From: "+ cur + "-------------------------------------")
+            }
+            
           }
+          
       work = false
     }
 
@@ -67,6 +82,7 @@ class DownActor extends Actor {
 
     def atPage(lst: Array[String]) = {
         val div = xm \\ "div"
+        atPageList
         div.foreach((c) => {
 
                     val ri = c \ "@class"
@@ -88,15 +104,54 @@ class DownActor extends Actor {
                         for(c <- (l2.length until 4 )){
                             l2 = "0"+ l2
                         }
-                        val actu = lst(2)+"-ch"+l1+"-p"+l2+".jpg"
-                        println("Parse: "+actu)
-                        control ! WorkDoneImg(Img(actu, src.toString), "http://www.onemanga.com" + href.toString)
+                        lst(2) match {
+                            case "/" => control ! NeedWork
+                            case "#" => control ! NeedWork
+                            case _ =>
+                                val actu = lst(2)+"-ch"+l1+"-p"+l2+".jpg"
+                                println("Parse: "+actu)
+                                control ! WorkDoneImg(Img(actu, src.toString), "http://www.onemanga.com" + href.toString)
+                        }
+                        //val actu = lst(2)+"-ch"+l1+"-p"+l2+".jpg"
+                        //println("Parse: "+actu)
+                        //control ! WorkDoneImg(Img(actu, src.toString), "http://www.onemanga.com" + href.toString)
                     }
 
         })
         //println(div)
         if(!q.isEmpty) control ! NeedWork
         true
+    }
+
+    def atPageList = {
+
+        //println ("atPageList")
+        val lst = curent.split("/").reverse
+        //println (lst)
+        var series = lst(2)
+        var chp = lst(1)
+        val sel = xm \\ "select"
+        sel.foreach((c) => {
+
+                val name = c \\ "@name"
+                if (name == "page"){
+                    val opt = c \\ "option"
+                    opt.foreach((cc) =>{
+
+                            val value = cc \ "@value"
+                            val ret = "http://www.onemanga.com/" + series + "/"+ chp + "/" + value
+                            control ! WorkDoneLink(ret)
+                            true
+
+                        })
+                    
+                }
+                
+
+        })
+       
+
+        //println ("end atPageList")
     }
 
     start

@@ -35,7 +35,7 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 */
 
-package ldc.bibleget
+package ldc.webget
 
 import org.xml.sax.InputSource
 import javax.xml.parsers.SAXParser

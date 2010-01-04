@@ -8,7 +8,7 @@
     to Xhtml and stores it in -xml-
  */
 
-package ldc.bibleget
+package ldc.webget
 
 import java.net._
 import java.io._

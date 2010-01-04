@@ -5,7 +5,7 @@
  * 
  */
 
-package ldc.bibleget
+package ldc.webget
 
 import scala.collection.mutable.{HashMap, HashSet, Queue}
 

@@ -53,6 +53,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>1.8.0.10</version>
+    </dependency>
+    <dependency>
        <groupId>org.ccil.cowan.tagsoup</groupId>
        <artifactId>tagsoup</artifactId>
        <version>1.2</version>
@@ -92,7 +97,7 @@
             <launchers>
         <launcher>
           <id>main</id>
-          <mainClass>ldc.bibleget.Main</mainClass>
+          <mainClass>ldc.webget.Main</mainClass>
         </launcher>
         <!-- you could define other launcher -->
       </launchers>
@@ -126,7 +131,7 @@
   <executions>
     <execution>
       <configuration>
-        <mainClass>ldc.bibleget.Main</mainClass>
+        <mainClass>ldc.webget.Main</mainClass>
       </configuration>
       <goals>
         <goal>one-jar</goal>

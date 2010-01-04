@@ -5,7 +5,7 @@
  * and is modded by Luke Harvey
  */
 
-package ldc.bibleget;
+package ldc.webget;
 
 
 import java.io.BufferedInputStream;
@@ -17,7 +17,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class BinDown {
-
+    public String origin;
     public void down(String ur, String fName) throws Exception {
 
         File seeF = new File(fName);
@@ -51,9 +51,11 @@ public class BinDown {
             out.write(data);
             out.flush();
             out.close();
-            System.out.println("File Writen: " + fName);
+            //System.out.println("File Writen: " + fName);
+            db.log4("report", origin, "File Writen: " + fName);
     }else{
-            System.out.println("File Exists");
+            //System.out.println("File Exists");
+            db.log4("report", origin, "File Exists");
     }
   }
 
@@ -67,12 +69,18 @@ public class BinDown {
         File f = new File(dir);
         try{
             if(f.mkdir())
-                System.out.println("Created: " + dir);
+                //System.out.println("Created: " + dir);
+                db.log4("report", origin, "Folder Created: " + dir);
             else
-                System.out.println("Not Created: " + dir);
+                //System.out.println("Not Created: " + dir);
+                db.log4("report", origin, "Folder Exists: " + dir);
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void setOrigin(String or){
+        origin = or;
     }
 }
 

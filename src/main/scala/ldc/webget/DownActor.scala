@@ -5,12 +5,13 @@
  * and open the template in the editor.
  */
 
-package ldc.bibleget
+package ldc.webget
 
 import scala.collection.mutable.{HashMap, HashSet, Queue}
 import scala.actors.Actor
 import scala.actors.Actor._
 import scala.xml._
+//import db.{log4 => log}
 
 class DownActor extends Actor {
     var work = false
@@ -19,6 +20,7 @@ class DownActor extends Actor {
     var xm: Node = <head/>
     var curent: String = ""
     val q = new Queue[String]
+    var origin = ""
 
     def act = {
         loop{
@@ -34,6 +36,9 @@ class DownActor extends Actor {
             }
         }
     }
+    def log(state: String, origin: String, body: String)={
+        DataController ! Log4Me(state, origin, body)
+    }
 
     def workCheck = {
         if (!work) control ! NeedWork
@@ -44,8 +49,9 @@ class DownActor extends Actor {
       val cur = q.dequeue
           if(cur != "empt"){
             val lst = cur.split("/").reverse
-            println ("LIST SIZE: " +lst.size)
-            if (lst.size <= 3) println("CUR: "+cur)
+            log("debug", origin,"LIST SIZE: " +lst.size)
+            //println ("LIST SIZE: " +lst.size)
+            if (lst.size <= 3) log("debug", origin,"CUR: "+cur)
 
             try {
             curent = cur
@@ -62,7 +68,9 @@ class DownActor extends Actor {
                 }
             }
             }catch{
-                case e => println("Error From: "+ cur + "-------------------------------------")
+                case e => 
+                    val err = "An error occured. <!>current unit of work: %s <!>my xm: %s <!>Stacktrace: %s".format(this.curent,this.xm,e.toString)
+                    log("error", origin, err)
             }
             
           }
@@ -74,7 +82,9 @@ class DownActor extends Actor {
         val ul = xm \\ "ul"
         val a = ul \\ "a"
         val lnk = a(0) \ "@href"
-        println("Parse: "+lnk)
+        log("report", origin,"Parse: "+lnk)
+        log("debug", origin,"REDUCED TO UL: %s  <!>REDUCED TO A: %s <!>REDUCED TO LNK:".format(ul,a,lnk))
+        //println("Parse: "+lnk)
         control ! WorkDoneLink("http://www.onemanga.com" + lnk.toString)
         if(!q.isEmpty) control ! NeedWork
         true
@@ -109,7 +119,8 @@ class DownActor extends Actor {
                             case "#" => control ! NeedWork
                             case _ =>
                                 val actu = lst(2)+"-ch"+l1+"-p"+l2+".jpg"
-                                println("Parse: "+actu)
+                                //println("Parse: "+actu)
+                                log("report", origin, "Parse: "+actu)
                                 control ! WorkDoneImg(Img(actu, src.toString), "http://www.onemanga.com" + href.toString)
                         }
                         //val actu = lst(2)+"-ch"+l1+"-p"+l2+".jpg"

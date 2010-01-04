@@ -11,10 +11,15 @@
     (artifact from first stage)
  */
 
-package ldc.bibleget
+package ldc.webget
 
 import scala.xml._
 import scala.collection.mutable._
+import scala.actors.Actor
+import scala.actors.Actor._
+
+case class oneIn(key: String)
+case class oneOut(q: Queue[String])
 
 class OneManga {
     //url - the location of website
@@ -28,9 +33,27 @@ class OneManga {
     var folders = new HashMap[String, String]
     var urlIndex = new Queue[String]
 
+    val oneAct = actor{
+        loop{
+            react{
+                case oneIn(key) =>
+                    println("One manga oneIn")
+                    DownController ! oneIn(key)
+                case oneOut(q) =>
+                    urlIndex ++= q.reverse
+                    println("One manga oneOut")
+                    run
+                    println("angelDone")
+                    //DownController ! SetDowns(20) //this command needs a scale down
+                    DownController !? AddImgs(urlIndex)
+                    DownController ! Ping
+            }
+        }
+    }
+
     //this is used to start downloading
     def run = {
-        titleSeq
+        //titleSeq
         //mangaSeq("/12_Prince/")
         //mangaSeq("/Ane_Doki/")
         //mangaSeq("/Veritas/")
@@ -45,10 +68,7 @@ class OneManga {
         //mangaSeq("/Mahou_Sensei_Negima!/")
         //mangaSeq("/Shut_Hell/")
         //urlIndex.foreach(println(_))
-        println("angelDone")
-	DownController ! SetDowns(20) //this command needs a scale down
-        DownController !? AddImgs(urlIndex)
-        DownController ! Ping
+        
 
     }
 
@@ -86,23 +106,8 @@ class OneManga {
 
     //download the initial chapter links for initial parseing
     def mangaSeq(key:String) = {
-        val manga = new NetParse
         val s = url + key
-        manga.parse(s)
-        val mXml = manga.xml
-
-        var q = new Queue[String]
-
-        val td = mXml \\ "td"
-        val a = td \ "a"
-        a.foreach((x) =>{
-                val ro = x.attribute("href")
-                ro match{
-                    case Some(res) => q.enqueue(url + res.toString)
-                    case _ => false
-                }
-        })
-        urlIndex ++= q.reverse
+        oneAct ! oneIn(s)
     }
 
     //puts the title into a swing list
@@ -110,8 +115,9 @@ class OneManga {
         import scala.util.Sorting
         val get = new javax.swing.DefaultListModel
         titleSeq
+        val gets = db.getAHash("om_getlist").split(",")
+        gets.foreach((e) =>{folders -- gets})
         val key = folders.keys
-
         key.foreach((sub) => get.addElement(sub))
         
         return get

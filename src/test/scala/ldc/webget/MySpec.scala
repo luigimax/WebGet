@@ -1,3 +1,10 @@
+/*
+---------------------------------------------------
+MySpec.scala:
+    Purpose: Just a default test
+    Author: Scala Spec
+ ---------------------------------------------------
+*/
 package ldc.webget
 
 import org.specs._

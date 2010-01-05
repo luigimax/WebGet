@@ -1,9 +1,10 @@
 /*
- * DataController.scala
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
+---------------------------------------------------
+db.scala:
+    Purpose: The database class
+    Author: Luke Harvey
+ ---------------------------------------------------
+*/
 
 package ldc.webget
 
@@ -24,6 +25,35 @@ case class Unique
 case class nonUni
 
 object DataController extends Actor {
+    /*
+===================================================
+DataConroller Event Listener Section:
+    Purpose: Listens and responds to messages
+    Used Case Classes:
+        -Log4Me: (state: String, origin: String, body: String)
+        -Done: (item: String)
+        -ImgQ: (desired: String, actual: String)
+        -GetImgQ:
+        -centQ: (item: String)
+        -Unique:
+        -nonUni:
+        -Img: (desired: String, actual: String)
+    Methods:
+        -act: the event loop
+            +Log4Me: thread safe logger - calls db.log and DataController.event
+                <pat>(state, origin, body) <line>case Log4Me(state, origin, body) =>
+            +Done: Adds an item to Done table
+                <pat>(item) <ret>Unique (or)nonUni <line>case Done(item)=>
+            +ImgQ: adds an image to the database
+                <pat>(desired, actual) <ret>Unique (or)nonUni <line>case ImgQ(desired, actual) =>
+            +centQ: adds a url to the database
+                <pat>(item) <ret>Unique (or)nonUni <line>case centQ(item) =>
+            +GetCentQ: retreives a centQueue url
+                <ret>String <line>case GetCentQ =>
+            +GetImgQ: retreives an Img entry
+                <ret>Img <line>case GetImgQ => reply(db.getImgQ)
+===================================================
+    */
     def act = {
         loop{
             react{
@@ -31,8 +61,7 @@ object DataController extends Actor {
                     event(state,origin,body)
                     log(state,origin,body)
                 case Done(item)=>
-                    try{//false if its not unique
-                         //println("done "+item)
+                    try{
                         db.addDone(item)
                         reply(Unique)
                     }catch{
@@ -60,6 +89,16 @@ object DataController extends Actor {
         }
     }
 
+    start
+    /*
+===================================================
+Event Section:
+    Purpose: Event listener triggerd by log writes
+    Methods:
+        -event: event listener
+            <pat>(state, origin, body)
+===================================================
+    */
     def event(state: String, origin: String, body: String)={
         val body_parse = """Parse: (.*)""".r
         val body_unique = "Unique Image added: (.*)".r
@@ -104,6 +143,4 @@ object DataController extends Actor {
         }
 
     }
-
-    start
 }

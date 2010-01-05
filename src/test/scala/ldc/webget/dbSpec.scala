@@ -1,9 +1,11 @@
 /*
- * dbSpec.scala
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
+---------------------------------------------------
+dbSpec.scala:
+    Purpose: Test object for the database
+    Author: Luke Harvey
+    Link: db.scala
+ ---------------------------------------------------
+*/
 
 package ldc.webget
 
@@ -15,9 +17,14 @@ class dbSpecTest extends JUnit4(dbSpec)
 object dbSpecRunner extends ConsoleRunner(dbSpec)
 
 object dbSpec extends Specification {
-    
+    /*
+===================================================
+Clear Section:
+    Purpose: Tests the database clear functions
+===================================================
+    */
     "db.clear" should{
-        Class.forName("org.hsqldb.jdbcDriver")
+        //Class.forName("org.hsqldb.jdbcDriver")
         "Wipe the Central Queue" in {
             db.addCentQ("Wipe the Central Queue")
             db.clear
@@ -53,7 +60,12 @@ object dbSpec extends Specification {
             
         }     
     }
-
+    /*
+===================================================
+Central Queue Section:
+    Purpose: Tests the database centQueue manipulation functions
+===================================================
+    */
     "Central Queue Calls" should {
         "Add a line into the db" in{
             db.clear
@@ -97,7 +109,12 @@ object dbSpec extends Specification {
         }
 
     }
-
+    /*
+===================================================
+Central Img Section:
+    Purpose: Tests the database imgtQueue manipulation functions
+===================================================
+    */
     "Central Img Queue Calls" should {
         "Add a line into the db" in{
             db.clear
@@ -143,9 +160,29 @@ object dbSpec extends Specification {
             }
         }
     }
-
+    /*
+===================================================
+Done Section:
+    Purpose: Tests the database Done manipulation functions
+===================================================
+    */
     "Done Calls should throw an exception if there is 2 of a kind" in{
         db.clear
-        
+        db.addDone("Done Calls should throw an exception if there is 2 of a kind")
+            try{
+                db.addDone("Done Calls should throw an exception if there is 2 of a kind")
+                false must beFalse
+            }catch{
+                case e => true must beTrue
+            }
+    }
+    /*
+===================================================
+Log Section:
+    Purpose: Tests the database Log manipulation functions
+===================================================
+    */
+    "Log Calls" should {
+        "do lotsa stuff" in{}
     }
 }

@@ -41,7 +41,13 @@ class DownActor extends Actor {
     }
 
     def workCheck = {
+        //implicit def unbox(i: Unit) = i.
         if (!work) control ! NeedWork
+        //val d = DataController !? GetCentQ
+        val d = db.getCentQ
+        if(d != ""){q.enqueue(d)}
+        if(!q.isEmpty) doWork
+        //println("check")
     }
 
     def doWork = {
@@ -85,7 +91,10 @@ class DownActor extends Actor {
         log("report", origin,"Parse: "+lnk)
         log("debug", origin,"REDUCED TO UL: %s  <!>REDUCED TO A: %s <!>REDUCED TO LNK:".format(ul,a,lnk))
         //println("Parse: "+lnk)
-        control ! WorkDoneLink("http://www.onemanga.com" + lnk.toString)
+        //control ! WorkDoneLink("http://www.onemanga.com" + lnk.toString)
+        doneIfy("http://www.onemanga.com" + lnk.toString)
+        DataController !? Done(curent)
+        //control ! Ping
         if(!q.isEmpty) control ! NeedWork
         true
     }
@@ -121,7 +130,12 @@ class DownActor extends Actor {
                                 val actu = lst(2)+"-ch"+l1+"-p"+l2+".jpg"
                                 //println("Parse: "+actu)
                                 log("report", origin, "Parse: "+actu)
-                                control ! WorkDoneImg(Img(actu, src.toString), "http://www.onemanga.com" + href.toString)
+                                DataController !? ImgQ(actu, src.toString) match{
+                                    case Unique => log("report", origin, "Unique Image added: %s".format(actu))
+                                }
+                                DataController !? Done(curent)
+                                doneIfy("http://www.onemanga.com" + href.toString)
+                                //control ! WorkDoneImg(Img(actu, src.toString), "http://www.onemanga.com" + href.toString)
                         }
                         //val actu = lst(2)+"-ch"+l1+"-p"+l2+".jpg"
                         //println("Parse: "+actu)
@@ -132,6 +146,15 @@ class DownActor extends Actor {
         //println(div)
         if(!q.isEmpty) control ! NeedWork
         true
+    }
+
+    def doneIfy(item: String) ={
+        val rec =db.checkDone(item)
+         rec match {
+              case "empt" => DataController ! CentQ(item)
+              case e => 
+         }
+         //control ! Ping
     }
 
     def atPageList = {
@@ -151,7 +174,9 @@ class DownActor extends Actor {
 
                             val value = cc \ "@value"
                             val ret = "http://www.onemanga.com/" + series + "/"+ chp + "/" + value
-                            control ! WorkDoneLink(ret)
+                            //control ! WorkDoneLink(ret)
+                            doneIfy(ret)
+                            DataController !? Done(curent)
                             true
 
                         })

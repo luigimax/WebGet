@@ -44,7 +44,7 @@ class OneManga {
                     println("One manga oneOut")
                     run
                     println("angelDone")
-                    //DownController ! SetDowns(20) //this command needs a scale down
+                    DownController ! SetDowns(20) //this command needs a scale down
                     DownController !? AddImgs(urlIndex)
                     DownController ! Ping
             }

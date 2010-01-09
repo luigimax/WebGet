@@ -10,6 +10,8 @@ package ldc.webget
 import scala.collection.mutable.{HashMap, HashSet, Queue}
 import scala.actors.Actor
 import scala.actors.Actor._
+import java.util.Timer
+import java.util.TimerTask
 //import db.{log4 => log}
 
 //messages
@@ -32,12 +34,13 @@ case class Img(desired: String, actual: String)
 object DownController extends Actor {
     var downs: Int = 1
     var dl: String = ""
-    val centralQ = new Queue[String]
+    //val centralQ = new Queue[String]
     val actList = new HashSet[Actor]
-    val centralImg = new Queue[Img]
-    val done = new HashSet[String]
-    val doneImg = new HashSet[Img]
+    //val centralImg = new Queue[Img]
+    //val done = new HashSet[String]
+    //val doneImg = new HashSet[Img]
     val origin = "Download Controller"
+    val time = new Timer
 
     def act = {
         loop{
@@ -88,14 +91,17 @@ object DownController extends Actor {
     }
 
     def logcQ(send: String) ={
-        if(centralQ.length != 0){
-            log("report", origin, "centralQ: %s sending %s".format(centralQ.length,send))
+        val c = db.countCentQ
+        if(c > 0){
+            log("report", origin, "centralQ: %s sending %s".format(c,send))
         }
     }
 
     def logcI(send: Img) ={
-        if(centralImg.length != 0){
-            log("report", origin, "centralQ: %s sending %s".format(centralImg.length,send.desired))
+        val c = db.countImgQ
+        //println(c)
+        if(c > 0){
+            log("report", origin, "imgQ: %s sending %s".format(c,send.desired))
         }
     }
 
@@ -121,7 +127,10 @@ object DownController extends Actor {
             log("report", origin, "Actor init Done: %s".format(r.origin))
             //println("Actor init Done: Bin")
         }
+        time.schedule(new CheckRe, 1000, 1000)
+        
     }
+    
 
     def killActors = {
         actList.foreach((c) => c.exit)
@@ -152,7 +161,7 @@ object DownController extends Actor {
         img match {            
             case Img(x,y) =>
                 if(x == "empt" || y == "empt"){
-                    log("report", origin, "Empty empty")
+                    //log("report", origin, "Empty empty")
                 }else{
                     log("report", origin, "Img: %s - %s".format(x,y))
                 }
@@ -172,18 +181,16 @@ object DownController extends Actor {
             
             //if(!done.contains(add)){
             //*
-            val res = DataController !? Done(add)
-            //println(res.toString)
-            res match {
-                case Unique =>
-                    DataController ! centQ(add)
-                    checkDist
-                case nonUni => 
-                    checkDist
-                    //println("nonUni "+ add)
+            //import ldc.webget.db.Item
+            val rec = db.checkDone(add)
+            println(add)
+            rec match {
+                case "empt" => DataController ! CentQ(add)
+                case e => 
             }
 
             //*/
+            checkDist
             /*
             if(!done.contains(add)){
                 centralQ += add
@@ -199,20 +206,23 @@ object DownController extends Actor {
 
     def cQ2(add: Queue[String]) ={
         add.foreach(cQ(_))
+
     }
 
     def cI(img: Img) = {
-        val res = DataController !? Done(img.toString)
+        //val res = DataController !? Done(img.toString)
             //println(res.toString)
+            /*
             res match {
                 case Unique =>
                     DataController ! ImgQ(img.desired,img.actual)
                     log("report", origin, "Unique Image added: %s".format(img.desired))
                     
-                case nonUni => 
+                case NonUni =>
                     
-                    //println("nonUni "+ add)
+                    //println("NonUni "+ add)
             }
+            */
             checkDist
 
 

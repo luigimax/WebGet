@@ -16,13 +16,14 @@ import db.{log, addQprog, addQmax}
 
 case class Log4Me(state: String, origin: String, body: String)
 case class Done(item: String)
+case class GetDone(item: String)
 case class ImgQ(desired: String, actual: String)
 case class GetImgQ
-case class centQ(item: String)
+case class CentQ(item: String)
 case class GetCentQ
 //response classes
 case class Unique
-case class nonUni
+case class NonUni
 
 object DataController extends Actor {
     /*
@@ -36,18 +37,18 @@ DataConroller Event Listener Section:
         -GetImgQ:
         -centQ: (item: String)
         -Unique:
-        -nonUni:
+        -NonUni:
         -Img: (desired: String, actual: String)
     Methods:
         -act: the event loop
             +Log4Me: thread safe logger - calls db.log and DataController.event
                 <pat>(state, origin, body) <line>case Log4Me(state, origin, body) =>
             +Done: Adds an item to Done table
-                <pat>(item) <ret>Unique (or)nonUni <line>case Done(item)=>
+                <pat>(item) <ret>Unique (or)NonUni <line>case Done(item)=>
             +ImgQ: adds an image to the database
-                <pat>(desired, actual) <ret>Unique (or)nonUni <line>case ImgQ(desired, actual) =>
+                <pat>(desired, actual) <ret>Unique (or)NonUni <line>case ImgQ(desired, actual) =>
             +centQ: adds a url to the database
-                <pat>(item) <ret>Unique (or)nonUni <line>case centQ(item) =>
+                <pat>(item) <ret>Unique (or)NonUni <line>case centQ(item) =>
             +GetCentQ: retreives a centQueue url
                 <ret>String <line>case GetCentQ =>
             +GetImgQ: retreives an Img entry
@@ -65,22 +66,24 @@ DataConroller Event Listener Section:
                         db.addDone(item)
                         reply(Unique)
                     }catch{
-                        case e => reply(nonUni)
+                        case e => reply(NonUni)
                     }
+                case GetDone(item) =>
+                    reply(db.checkDone(item))
                 case ImgQ(desired, actual) =>
                     try{//false if its not unique
                         db.addImgQ(desired,actual)
                         reply(Unique)
                     }catch{
-                        case e => reply(nonUni)
+                        case e => reply(NonUni)
                     }
-                case centQ(item) =>
+                case CentQ(item) =>
                     try{//false if its not unique
                         //println(item)
                         db.addCentQ(item)
                         reply(Unique)
                     }catch{
-                        case e => reply(nonUni)
+                        case e => reply(NonUni)
                     }
                 case GetCentQ =>
                     reply(db.getCentQ)

@@ -21,27 +21,6 @@ object Main {
       //val line = "Completed in 100ms (View: 25, DB: 75) | 200 OK [http://app.domain.com?params=here]"
       //val LogEntry(totalTime, viewTime, dbTime, responseCode, uri) = line
       //println(totalTime)
-      var n = 0
-      println("fancy %s".format(n))
-      n = n+1
-      db.addImgQ("string", "string")
-      println(db.getImgQ)
-      println(db.getImgQ)
-      println(db.getImgQ)
-      println(db.getImgQ)
-      println(db.getImgQ)
-      println(db.getImgQ)
-      println("fancy %s".format(n))
-      n = n+1
-      db.addImgQ("string", "string")
-      println(db.getImgQ)
-      println(db.getImgQ)
-      println(db.getImgQ)
-      println(db.getImgQ)
-      println(db.getImgQ)
-      println(db.getImgQ)
-      println("fancy %s".format(n))
-      n = n+1
       //DataController.event("report", "HTML Parser: 2", "13-ch0000-p0037.jpg already exists")
       val r1 = new MainFrm
       r1.setVisible(true)

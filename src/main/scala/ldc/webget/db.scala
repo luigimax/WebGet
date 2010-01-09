@@ -13,6 +13,7 @@ import DriverManager.{getConnection => connect}
 import ldc.webget.RichSQL._
 import java.io.File
 import scala.collection.mutable.{HashMap, HashSet, Queue}
+import scala.util.matching.Regex
 
 object db {
     /*
@@ -25,6 +26,7 @@ Declare Section:
         -Qprog: Ui progressbar current progress var
         -Hash: case class for Querying for a Hash
         -Log: case class for Querying for a Log
+        -LogRegex: case class for filtering by regex patterns
         -Item: case class for Querying for an Item
         -logUpdate: scala voodoo to get a java func in this class
 ===================================================
@@ -33,11 +35,15 @@ Declare Section:
     implicit val conn = connect("jdbc:hsqldb:file:db/webget;shutdown=true", "SA", "")
     var Qmax = 0
     var Qprog = 0
+    var Qcent = 0
+    var Qimg = 0
+    var Qdone = 0
 
     case class Hash(key: String, value: String) {
         def toXML = <hash id={key}>{value}</hash>
     }
     case class Log(state: String, origin: String, body: String)
+    case class LogRegex(state: Regex, origin: Regex, body: Regex)
     case class Item(item: String)
 
     //scala voodoo to get a java func in this class
@@ -115,8 +121,11 @@ Initialization Section:
             addHash("om_filesDir","")
         }
 
-        //for (val person <- query("select * from hash", rs => Hash(rs,rs)))
-        //    println(person.toXML)
+        Qdone = countDone.toInt
+        Qcent = countCentQ.toInt
+        Qimg = countImgQ.toInt
+        Qmax = Qdone - (Qcent + Qimg)
+
 
     }
     /*
@@ -218,13 +227,17 @@ Ui Update Section:
 ===================================================
     */
     def addQmax(add: Int)={
-        Qmax = Qmax + add
+        Qmax = Qcent + Qimg
+        //var n = ((countCentQ + countImgQ) - countDone)
+        //Qmax = Qmax + add
         logUpdate(Qprog,Qmax)
         println(Qprog + " " + Qmax)
     }
 
     def addQprog(add: Int) ={
-        Qprog = Qprog + add
+        //var n = countDone
+        //Qprog = Qprog + add
+        Qprog = Qdone
         logUpdate(Qprog,Qmax)
         println(Qprog + " " + Qmax)
     }
@@ -298,6 +311,25 @@ Done Section:
     def addDone(item: String) ={
         implicit val s: Statement = conn << ""
         s.executeQuery("insert into Done values('%s')".format(item))
+        Qdone = Qdone +1
+    }
+
+    def countDone: Long ={
+        implicit val s: Statement = conn << ""
+        var cn:Long = 0
+        for (val it <- query("select * from Done", rs => Item(rs))){
+            cn = cn+1
+        }
+        cn
+    }
+
+    def checkDone(item:String): String ={
+        implicit val s: Statement = conn << ""
+        var ret = "empt"
+        for (val it <- query("select * from Done where item='%s'".format(item), rs => Item(rs))){
+            ret = it.item
+        }
+        ret
     }
     /*
 ===================================================
@@ -320,6 +352,7 @@ Img Queue Section:
     def addImgQ(desired: String, actual: String) ={
         implicit val s: Statement = conn << ""
         s.executeQuery("insert into imgQueue values('%s', '%s')".format(desired,actual))
+        Qimg = Qimg +1
     }
 
     def countImgQ: Long ={
@@ -339,6 +372,7 @@ Img Queue Section:
             //return img
             //println(st.desired +" getImgQ")
             s.executeQuery("delete from imgQueue where desired='%s'".format(img.desired))
+            //Qimg = Qimg - 1
         }
         st
     }
@@ -362,6 +396,7 @@ Central Queue Section:
     def addCentQ(item: String) ={
         implicit val s: Statement = conn << ""
         s.executeQuery("insert into centQueue values('%s')".format(item))
+        Qcent = Qcent +1
     }
 
     def countCentQ: Long ={
@@ -380,6 +415,7 @@ Central Queue Section:
             st = it.item
             //println(st +" getCentQ")
             s.executeQuery("delete from centQueue where item='%s'".format(st))
+            //Qcent = Qcent -1
         }       
         st
     }
@@ -398,13 +434,27 @@ Logs Section:
             <pat>(state, origin, body)
         -getOrigins: returns a list of origins for the ui log viewer
             <ret>javax.swing.DefaultListModel
+        -getOrigins: returns a filtered list of origins based on a exact match
+            <pat>(filter: Log) <ret>javax.swing.DefaultListModel
+        -getOrigins: returns a filtered list of origins based on a exact match
+            <pat>(filter: LogRegex) <ret>javax.swing.DefaultListModel
+        -getFilterLog: returns a log based on exact strings
+            <pat>(filter:Log) <ret>HashSet[Log]
+        -getRegexLog: returns a log based on a regex pattern
+            <pat>(filter:LogRegex) <ret>HashSet[Log]
+        -filterState: returns a HashSet of log entries filtered by state
+            <pat>(state) <ret>HashSet[Log]
+        -filterOrigin: returns a HashSet of log entries filtered by origin
+            <pat>(origin) <ret>HashSet[Log]
+        -filterStateOrigin: returns a HashSet of log entries filtered by state and origin
+            <pat>(state, origin) <ret>HashSet[Log]
      Also See:
         db.<Initialization Section:>
 ===================================================
     */
     def log(state: String, origin: String, body: String)={
         implicit val s: Statement = conn << ""
-        println(origin)
+        //println(origin)
         val insertLog = conn prepareStatement "insert into Log(state, origin, body) values(?, ?, ?)"
         insertLog<<state<<origin<<body<<!
     }
@@ -422,6 +472,87 @@ Logs Section:
         }
         hset.foreach(ret.addElement(_))
         return ret
+    }
+
+    def getOrigins(filter: Log):javax.swing.DefaultListModel={
+        val ret = new javax.swing.DefaultListModel
+        var hset = getFilterLog(filter)
+        hset.foreach((e) => ret.addElement(e.body))
+        return ret
+    }
+
+    def getOrigins(filter: LogRegex):javax.swing.DefaultListModel={
+        val ret = new javax.swing.DefaultListModel
+        var hset = getRegexLog(filter)
+        hset.foreach((e) => ret.addElement(e.body))
+        return ret
+    }
+
+    def getFilterLog(filter:Log):HashSet[Log]={
+        implicit val s: Statement = conn << ""
+        val hset = new HashSet[Log]
+        var q = "select * from Log"
+
+        if(filter != Log("","","")) q concat " where"
+        if(filter.state != "") q concat " state='%s'".format(filter.state)
+        if(filter.state != "") q concat " origin='%s'".format(filter.origin)
+        if(filter.state != "") q concat " body='%s'".format(filter.body)
+        for (val log <- query(q, rs => Log(rs,rs,rs))){
+            hset += log
+        }
+        return hset
+    }
+
+    def getRegexLog(filter:LogRegex):HashSet[Log] ={
+        implicit val s: Statement = conn << ""
+        val hset = new HashSet[Log]
+        
+        if(filter == LogRegex("".r,"".r,"".r)) return hset
+        for (val log <- query("select * from Log", rs => Log(rs,rs,rs))){
+            hset += log
+        }
+        val blank = "".r
+        val finHset = new HashSet[Log]
+        hset.foreach((e) => {
+            if(regMatch(filter.state, e.state) && regMatch(filter.origin, e.origin) && regMatch(filter.body, e.body)){
+                finHset += e
+            }
+        })
+    
+        return finHset
+    }
+
+    def regMatch(pattern: Regex, str: String):Boolean ={
+        if (pattern == "".r) return true
+        if (pattern.findFirstIn(str) != Some(None)) return true
+        return false
+    }
+
+    def filterState(state: String): HashSet[Log] ={
+        implicit val s: Statement = conn << ""
+        val hset = new HashSet[Log]
+        for (val log <- query("select * from Log where state='%s'".format(state), rs => Log(rs,rs,rs))){
+            hset += log
+        }
+        hset
+    }
+
+    def filterOrigin(origin: String): HashSet[Log]={
+        implicit val s: Statement = conn << ""
+        val hset = new HashSet[Log]
+        for (val log <- query("select * from Log where origin='%s'".format(origin), rs => Log(rs,rs,rs))){
+            hset += log
+        }
+        hset
+    }
+
+    def filterStateOrigin(state: String, origin: String): HashSet[Log] ={
+        implicit val s: Statement = conn << ""
+        val hset = new HashSet[Log]
+        for (val log <- query("select * from Log where state='%s' and origin='%s'".format(state,origin), rs => Log(rs,rs,rs))){
+            hset += log
+        }
+        hset
     }
     /*
 ===================================================

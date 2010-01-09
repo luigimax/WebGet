@@ -25,7 +25,9 @@ class BinGetActor extends Actor {
     def act = {
         loop{
             react{
+                case Ping =>
                 case WantWork =>
+                    workCheck
                     reply(NeedImgWork)
                 case InitActor(act)=>
                     control = act
@@ -34,23 +36,31 @@ class BinGetActor extends Actor {
                 case AddBin(img) =>
                     if(img != empt) {
                         q.enqueue(img)
-                        doWork(img)
+                        doWork
+                        work = false
                     }
+                    if(!q.isEmpty) doWork
+                    workCheck
                     
             }
         }
     }
 
     def workCheck = {
-        if (!work) control ! NeedWork
+        if (!work && q.size < 5) control ! NeedImgWork
+        //val d = DataController !? GetImgQ
+        val d = db.getImgQ
+        if(d != empt){q.enqueue(d)}
+        
     }
 
     def log(state: String, origin: String, body: String)={
         DataController ! Log4Me(state, origin, body)
     }
 
-    def doWork(img: Img) = {
+    def doWork = {
         work = true
+        var img = q.dequeue
         val er = img.desired.split("-")
         val dir = DownController.dl + er(0)
         val f = dir+"/"+img.desired
@@ -61,8 +71,10 @@ class BinGetActor extends Actor {
             bin.down(img.actual, f)
             if (checkFile(f)){
                 log("report", origin, "Downloaded Img: "+ img.desired)
+                DataController !? Done(img.toString)
             }else{
                 log("report", origin, "Retrival of %s failed".format(img.desired))
+                DataController !? ImgQ(img.desired,img.actual)
             }
             //println("Got: "+ img.desired)
         }else{

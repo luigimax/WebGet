@@ -19,6 +19,18 @@ object dbSpecRunner extends ConsoleRunner(dbSpec)
 object dbSpec extends Specification {
     /*
 ===================================================
+Declare Section:
+    Purpose: Declare functions to reduce typing
+    Methods:
+        -mepass: causes a test to pass
+        -mefail: causes a test to fail
+===================================================
+    */
+    def mepass ={true must beTrue}
+    def mefail ={false must beTrue}
+
+    /*
+===================================================
 Clear Section:
     Purpose: Tests the database clear functions
 ===================================================
@@ -182,7 +194,138 @@ Log Section:
     Purpose: Tests the database Log manipulation functions
 ===================================================
     */
+    import db.{Log, LogRegex}
     "Log Calls" should {
-        "do lotsa stuff" in{}
+        "Filter by State" in{
+            db.clear
+            db.log("debug", "Filter by state (log)", "string is cool")
+            db.log("report", "Filter by state (log)", "string is cool")
+            db.log("debug", "Filter by state (log)", "string is cool")
+            val res = db.filterState("debug")
+            var bool = false
+            if(res.size == 0){
+                db.log("test", "Filter by state (log)", "test returned a blank HashSet")
+            }
+            res.foreach((e) => {
+                    e match{
+                        case Log("report",_,_) =>
+                            db.log("test", "Filter by state (log)", "test returned a report")
+                        case Log("debug",_,_) => bool = true
+                        case Log(e,_,_) =>
+                            db.log("test", "Filter by state (log)", "test returned:%s".format(e))
+                    }
+                })
+            if(bool){mepass}else mefail
+        }
+
+        "Filter by Origin" in{
+            db.clear
+            db.log("debug", "Filter by Origin", "string is cool")
+            db.log("report", "test)", "string is cool")
+            db.log("debug", "Filter by Origin", "string is cool")
+            val res = db.filterOrigin("Filter by Origin")
+            var bool = false
+            if(res.size == 0){
+                db.log("test", "Filter by Origin (log)", "test returned a blank HashSet")
+            }
+            res.foreach((e) => {
+                    e match{
+                        case Log(_,"test)",_) =>
+                            db.log("test", "Filter by Origin (log)", "test returned a test)")
+                        case Log(_,"Filter by Origin",_) => bool = true
+                        case e =>
+                            db.log("test", "Filter by Origin (log)", "test returned:%s".format(e.toString))
+                    }
+                })
+            if(bool){mepass}else mefail
+        }
+
+        "Filter by State and Origin" in {
+            db.log("debug", "Filter by State and Origin", "string is cool")
+            db.log("test", "Filter by State and Origin", "string is cool")
+            db.log("report", "test)", "string is cool")
+            db.log("debug", "Filter by State and Origin", "string is cool")
+            val res = db.filterStateOrigin("debug","Filter by State and Origin")
+            var bool = true
+            if(res.size == 0){
+                db.log("report", "Filter by Origin (log)", "test returned a blank HashSet")
+            }
+            res.foreach((e) => {
+                    e match{
+                        case Log("debug","Filter by State and Origin",_) => 
+                        case e =>
+                            bool = false
+                            db.log("test", "Filter by Origin (log)", "test returned:%s".format(e.toString))
+                    }
+                })
+            if(bool){mepass}else mefail
+        }
+
+        "Regex Filter by State" in{
+            db.clear
+            db.log("debug", "Regex Filter by State", "string is cool")
+            db.log("test", "Regex Filter by State", "string is cool")
+            db.log("report", "test)", "string is cool")
+            val res = db.getRegexLog(LogRegex("deb(.*)".r,"".r,"".r))
+            var bool = true
+            if(res.size == 0){
+                db.log("report", "Regex Filter by State (log)", "test returned a blank HashSet")
+            }
+            if(res.size != 1){
+                db.log("report", "Regex Filter by State (log)", "test returned more results that needed")
+            }
+            res.foreach((e) => {
+                    e match{
+                        case Log("debug",_,_) => println(e.toString)
+                        case e =>
+                            bool = false
+                            db.log("test", "Filter by Origin (log)", "test returned:%s".format(e.toString))
+                    }
+                })
+            if(bool){mepass}else mefail
+        }
+
+        "Regex Filter by Origin" in{}
+
+        "Regex Filter by Body" in{}
+
+        "Regex Filter by State and Origin" in{}
+
+        "Regex Filter by State, Origin and Body" in{}
+
+        "Return a DefaultModel of origins" in{
+            db.clear
+            var bool = false
+            db.log("debug", "Return a DefaultModel of origins1", "string is cool")
+            db.log("report", "Return a DefaultModel of origins2", "string is cool")
+            db.log("debug", "Return a DefaultModel of origins3", "string is cool")
+            val ret = db.getOrigins
+            val ar = ret.toArray
+            if(ar.size == 3) bool = true
+            ar.foreach((e) => {
+                    e match{
+                        case "Return a DefaultModel of origins1" =>
+                        case "Return a DefaultModel of origins2" =>
+                        case "Return a DefaultModel of origins3" =>
+                        case e =>
+                            db.log("test", "Return a DefaultModel of origins (log)", "Failed result: " + e.toString)
+                            bool = false
+                    }
+                })
+
+            if(bool){mepass}else mefail
+        }
+
+        "Return a DefaultModel of origins filtered by State" in{}
+
+        "Return a DefaultModel of origins filtered by origin" in{}
+
+        "Return a DefaultModel of origins filtered by body" in{}
+
+        "Return a DefaultModel of origins Regex filtered by State" in{}
+
+        "Return a DefaultModel of origins Regex filtered by State" in{}
+
+        "Return a DefaultModel of origins Regex filtered by State" in{}
     }
 }
